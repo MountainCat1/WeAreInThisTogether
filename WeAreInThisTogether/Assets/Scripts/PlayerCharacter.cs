@@ -39,7 +39,6 @@ public class PlayerCharacter : NetworkBehaviour
             Debug.Log("Sending ping to clients...");
             PingClientRpc(Time.frameCount, "hello, world i am a server!"); // Server -> Client
         }
-
         
         HandleMovement();
     }
