@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameManager Instance { get; private set; }
+    public static GameManager Instance { get; private set; }
     
     [SerializeField] private NetworkManager _networkManager;
-
+    
     private void Awake()
     {
         if(Instance != null)
@@ -20,8 +20,26 @@ public class GameManager : MonoBehaviour
 
     public void HostGame()
     {
-        Debug.Log("Starting a game host");
+        if (_networkManager.IsClient || _networkManager.IsHost || _networkManager.IsClient)
+        {
+            Debug.LogError("Can't host. Network manager is already connected client or server!");
+            return;
+        }
+        
+        Debug.Log("Starting a game as host...");
         _networkManager.StartHost();
         
+    }
+
+    public void JoinGame()
+    {
+        if (_networkManager.IsClient || _networkManager.IsHost || _networkManager.IsClient)
+        {
+            Debug.LogError("Can't join game. Network manager is already connected client or server!");
+            return;
+        }
+        
+        Debug.Log("Joining a game as client...");
+        _networkManager.StartClient();
     }
 }
