@@ -12,10 +12,24 @@ public class GameManager : MonoBehaviour
     
     private void Awake()
     {
+        // Singleton
         if(Instance != null)
             Debug.LogError($"Singleton duplicated! {typeof(GameManager)}");
-        
         Instance = this;
+        
+        // Assign event handlers of _networkManager
+        _networkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
+        _networkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
+    }
+
+    private void NetworkManagerOnOnClientDisconnectCallback(ulong clientId)
+    {
+        Debug.Log($"Client ({clientId}) disconnected!");
+    }
+
+    private void NetworkManagerOnOnClientConnectedCallback(ulong clientId)
+    {
+        Debug.Log($"Client ({clientId}) connected!");
     }
 
     public void HostGame()
@@ -41,5 +55,17 @@ public class GameManager : MonoBehaviour
         
         Debug.Log("Joining a game as client...");
         _networkManager.StartClient();
+    }
+
+    public void LeaveGame()
+    {
+        if (!_networkManager.IsClient)
+        {
+            Debug.LogError("Cannot leave game. You are not a connected client!");
+            return;
+        }
+        
+        Debug.Log("Shutting down network manager...");
+        _networkManager.Shutdown();
     }
 }

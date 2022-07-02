@@ -21,4 +21,9 @@ public class DebugMenu : MonoBehaviour
     {
         _gameManager.JoinGame();
     }
+    
+    public void LeaveGame()
+    {
+        _gameManager.LeaveGame();
+    }
 }
