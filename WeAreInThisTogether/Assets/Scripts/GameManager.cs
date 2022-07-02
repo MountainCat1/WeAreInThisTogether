@@ -8,9 +8,11 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Singleton { get; private set; }
     
-    
     [SerializeField] private NetworkManager _networkManager;
-    
+    [SerializeField] private NetworkObject _playerCharacterPrefab;
+
+    // Settings
+    [SerializeField] private bool spawnPlayersOnConnection = true;
     
     #region CallbackHadlers
     private void NetworkManagerOnOnClientDisconnectCallback(ulong clientId)
@@ -20,6 +22,9 @@ public class GameManager : MonoBehaviour
     private void NetworkManagerOnOnClientConnectedCallback(ulong clientId)
     {
         Debug.Log($"Client ({clientId}) connected!");
+        
+        if(_networkManager.IsServer)
+            SpawnPlayerCharacter(clientId);
     }
     #endregion
 
@@ -73,5 +78,13 @@ public class GameManager : MonoBehaviour
         
         Debug.Log("Shutting down network manager...");
         _networkManager.Shutdown();
+    }
+
+
+    private void SpawnPlayerCharacter(ulong clientId)
+    {
+        var go = Instantiate(_playerCharacterPrefab.gameObject);
+        go.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
+        Debug.Log($"Spawning player character for client ({clientId})");
     }
 }
