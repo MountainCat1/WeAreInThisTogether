@@ -6,31 +6,39 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Singleton { get; private set; }
+    
     
     [SerializeField] private NetworkManager _networkManager;
+    
+    
+    #region CallbackHadlers
+    private void NetworkManagerOnOnClientDisconnectCallback(ulong clientId)
+    {
+        Debug.Log($"Client ({clientId}) disconnected!");
+    }
+    private void NetworkManagerOnOnClientConnectedCallback(ulong clientId)
+    {
+        Debug.Log($"Client ({clientId}) connected!");
+    }
+    #endregion
+
+    #region Events
+
+    #endregion
     
     private void Awake()
     {
         // Singleton
-        if(Instance != null)
+        if(Singleton != null)
             Debug.LogError($"Singleton duplicated! {typeof(GameManager)}");
-        Instance = this;
+        Singleton = this;
         
         // Assign event handlers of _networkManager
         _networkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
         _networkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
     }
 
-    private void NetworkManagerOnOnClientDisconnectCallback(ulong clientId)
-    {
-        Debug.Log($"Client ({clientId}) disconnected!");
-    }
-
-    private void NetworkManagerOnOnClientConnectedCallback(ulong clientId)
-    {
-        Debug.Log($"Client ({clientId}) connected!");
-    }
 
     public void HostGame()
     {
@@ -44,7 +52,6 @@ public class GameManager : MonoBehaviour
         _networkManager.StartHost();
         
     }
-
     public void JoinGame()
     {
         if (_networkManager.IsClient || _networkManager.IsHost || _networkManager.IsClient)
@@ -56,7 +63,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Joining a game as client...");
         _networkManager.StartClient();
     }
-
     public void LeaveGame()
     {
         if (!_networkManager.IsClient)
