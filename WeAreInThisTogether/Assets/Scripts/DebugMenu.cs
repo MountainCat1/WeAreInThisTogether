@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DebugMenu : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI statusDisplay;
+    [SerializeField] private TMP_InputField playerNameInputField;
     
     private GameManager _gameManager;
     private NetworkManager _networkManager;
@@ -58,5 +60,13 @@ public class DebugMenu : MonoBehaviour
             return;
         }
         statusDisplay.text = "Disconnected";
+    }
+
+    public PlayerData CreatePlayerData()
+    {
+        return new PlayerData()
+        {
+            Username = playerNameInputField.text 
+        };
     }
 }

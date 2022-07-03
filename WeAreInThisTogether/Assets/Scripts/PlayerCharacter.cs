@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -8,13 +9,27 @@ using UnityEngine;
 [RequireComponent(typeof(NetworkTransform))]
 public class PlayerCharacter : NetworkBehaviour
 {
+    [SerializeField] private TextMeshProUGUI nameDisplay; 
+        
     [SerializeField] private float speed = 1f;
 
     private NetworkTransform _networkTransform;
+    private Player _player;
     
     private void Awake()
     {
         _networkTransform = GetComponent<NetworkTransform>();
+        
+        Player.OnPlayerDataSyncCallback += PlayerOnOnPlayerDataSyncCallback;
+        PlayerOnOnPlayerDataSyncCallback();
+    }
+
+    private void PlayerOnOnPlayerDataSyncCallback()
+    {
+        if (_player == null)
+            _player = Player.GetPlayer(OwnerClientId);
+
+        nameDisplay.text = _player.PlayerData.Username;
     }
 
     public override void OnNetworkSpawn()

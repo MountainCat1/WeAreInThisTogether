@@ -79,8 +79,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Shutting down network manager...");
         _networkManager.Shutdown();
     }
-
-
+    
     private void SpawnPlayerCharacter(ulong clientId)
     {
         var go = Instantiate(_playerCharacterPrefab.gameObject);
