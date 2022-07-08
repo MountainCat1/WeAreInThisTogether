@@ -369,7 +369,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameDisplay: {fileID: 2898901304568207626}
-  speed: 4
+  missilePrefab: {fileID: 3383380512720517178, guid: 8de2ae2e3ad776740bc4c3b6f380d122,
+    type: 3}
+  movementSpeed: 3
 --- !u!114 &9122687908844149633
 MonoBehaviour:
   m_ObjectHideFlags: 0

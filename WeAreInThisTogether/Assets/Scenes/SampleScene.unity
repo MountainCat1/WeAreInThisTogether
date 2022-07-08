@@ -1896,6 +1896,12 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 1896508677182500263, guid: 8de2ae2e3ad776740bc4c3b6f380d122,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -34463,6 +34469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cde231fc0c777c4097c14f2a4757b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _camera: {fileID: 1537147379}
   _networkManager: {fileID: 1434357626}
   _playerCharacterPrefab: {fileID: 9122687908844149633, guid: 3dd725f5e641c1a47a50a041b0ff8cb1,
     type: 3}

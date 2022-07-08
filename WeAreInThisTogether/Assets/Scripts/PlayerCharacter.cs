@@ -5,23 +5,29 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(NetworkTransform))]
 public class PlayerCharacter : NetworkBehaviour
 {
-    [SerializeField] private TextMeshProUGUI nameDisplay; 
-        
-    [SerializeField] private float speed = 1f;
+    [SerializeField] private TextMeshProUGUI nameDisplay;
+
+    [SerializeField] private Missile missilePrefab;
+    [SerializeField] private float movementSpeed = 1f;
 
     private NetworkTransform _networkTransform;
     private Player _player;
-    
+
     private void Awake()
     {
-        _networkTransform = GetComponent<NetworkTransform>();
-        
         Player.OnPlayerDataSyncCallback += PlayerOnOnPlayerDataSyncCallback;
+        
+    }
+
+    private void Start()
+    {
         PlayerOnOnPlayerDataSyncCallback();
+        _networkTransform = GetComponent<NetworkTransform>();
     }
 
     private void PlayerOnOnPlayerDataSyncCallback()
@@ -43,38 +49,60 @@ public class PlayerCharacter : NetworkBehaviour
         if(!IsOwner)
             return;
         
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            Debug.Log("Sending ping to the server...");
-            PingServerRpc(Time.frameCount, "hello, world"); // Client -> Server
-        }
-        
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            Debug.Log("Sending ping to clients...");
-            PingClientRpc(Time.frameCount, "hello, world i am a server!"); // Server -> Client
-        }
-        
         HandleMovement();
+        
+        if(Input.GetMouseButtonDown(0))
+            HandleShooting();
+    }
+
+    private void HandleShooting()
+    {
+        var mousePosition = GameManager.Singleton.Camera.ScreenToWorldPoint(Input.mousePosition);
+        var direction = (mousePosition - transform.position).normalized;
+
+        var missile = SpawnMissile(direction);
+
+        if (IsServer)
+        {
+            missile.NetworkObject.Spawn();
+        }
+        else
+        {
+            SpawnMissileServerRpc(direction);
+        }
+    }
+
+    [ServerRpc]
+    void SpawnMissileServerRpc(Vector2 direction)
+    {
+        SpawnMissile(direction);
+        //SpawnMissileClientRpc(direction);
+    }
+
+    /*[ClientRpc]
+    private void SpawnMissileClientRpc(Vector2 direction)
+    {
+        SpawnMissile(direction);
+    }*/
+
+    Missile SpawnMissile(Vector2 direction)
+    {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        var rotation  = Quaternion.AngleAxis(angle, Vector3.forward);
+        
+        var go = Instantiate(missilePrefab.gameObject, transform.position, rotation, null);
+        var missile = go.GetComponent<Missile>();
+
+        missile.Direction = direction.normalized;
+        
+        return missile;
     }
 
     private void HandleMovement()
     {
         var movement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        var step = Time.deltaTime * speed;
+        var step = Time.deltaTime * movementSpeed;
 
         transform.position = (Vector2)transform.position + (movement * step);
-    }
-
-    [ServerRpc(Delivery = RpcDelivery.Reliable)]
-    void PingServerRpc(int somenumber, string sometext)
-    {
-        Debug.Log($"Super message from ({OwnerClientId}): {sometext}");
-    }
-    
-    [ClientRpc]
-    void PingClientRpc(int somenumber, string sometext)
-    {
-        Debug.Log($"Super message from ({OwnerClientId}): {sometext}");
     }
 }

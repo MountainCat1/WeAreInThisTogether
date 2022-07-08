@@ -7,13 +7,16 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Singleton { get; private set; }
-    
+
+    [SerializeField] private Camera _camera;
     [SerializeField] private NetworkManager _networkManager;
     [SerializeField] private NetworkObject _playerCharacterPrefab;
 
     // Settings
     [SerializeField] private bool spawnPlayersOnConnection = true;
     
+    public Camera Camera => _camera;
+
     #region CallbackHadlers
     private void NetworkManagerOnOnClientDisconnectCallback(ulong clientId)
     {
@@ -43,8 +46,6 @@ public class GameManager : MonoBehaviour
         _networkManager.OnClientConnectedCallback += NetworkManagerOnOnClientConnectedCallback;
         _networkManager.OnClientDisconnectCallback += NetworkManagerOnOnClientDisconnectCallback;
     }
-
-
     public void HostGame()
     {
         if (_networkManager.IsClient || _networkManager.IsHost || _networkManager.IsClient)
